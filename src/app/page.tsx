@@ -1,6 +1,9 @@
 import { WikiCard } from "@/components/ui/wiki-card";
+import { useUser } from "@stackframe/stack";
 
 export default function Home() {
+  // useUser({ or: "redirect" }); //XSS attack possible
+
   return (
     <div>
       <main className="mx-auto mt-10 flex max-w-2xl flex-col gap-6">
