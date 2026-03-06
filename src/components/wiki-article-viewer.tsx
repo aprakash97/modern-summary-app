@@ -26,7 +26,7 @@ interface WikiArticleViewerProps {
 
 export default function WikiArticleViewer({
   article,
-  canEdit = false,
+  canEdit,
 }: WikiArticleViewerProps) {
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -87,7 +87,7 @@ export default function WikiArticleViewer({
             </Link>
 
             {/* Delete form calls the server action wrapper */}
-            <form action={deleteArticleForm}>
+            <form action={async (formData) => { await deleteArticleForm(formData); }}>
               <input type="hidden" name="id" value={String(article.id)} />
               <Button
                 type="submit"
@@ -230,7 +230,7 @@ export default function WikiArticleViewer({
               </Button>
             </Link>
 
-            <form action={deleteArticleForm}>
+            <form action={async (formData) => { await deleteArticleForm(formData); }}>
               <input type="hidden" name="id" value={String(article.id)} />
               <Button
                 type="submit"

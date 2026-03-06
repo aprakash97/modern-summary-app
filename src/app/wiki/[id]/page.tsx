@@ -1,4 +1,8 @@
+import NotFound from "@/app/not-found";
 import WikiArticleViewer from "@/components/wiki-article-viewer";
+import { authorizeToEditArticle } from "@/db/authz";
+import { getArticleById } from "@/lib/data/articles";
+import { stackServerApp } from "@/stack/server";
 
 interface ViewArticlePageProps {
   params: Promise<{
@@ -10,101 +14,109 @@ export default async function ViewArticlePage({
   params,
 }: ViewArticlePageProps) {
   const { id } = await params;
+  const article = await getArticleById(+id);
 
   // Mock permission check - in a real app, this would come from auth/user context
-  const canEdit = true; // Set to true for demonstration
+  // const canEdit = true; // Set to true for demonstration
+
+  const loggedInUser = await stackServerApp.getUser({ or: "redirect" });
+
+  const isEditable = await authorizeToEditArticle(loggedInUser.id, +id);
+  if (!article) {
+    return <NotFound />;
+  }
 
   // Mock article data - in a real app, this would be fetched from an API
-  const mockArticle = {
-    id: +id,
-    title: "Welcome to WikiFlow",
-    content: `# Getting Started with WikiFlow
+  //   const mockArticle = {
+  //     id: +id,
+  //     title: "Welcome to WikiFlow",
+  //     content: `# Getting Started with WikiFlow
 
-Welcome to your personal wiki system! This is a comprehensive guide to help you understand how to use WikiFlow effectively.
+  // Welcome to your personal wiki system! This is a comprehensive guide to help you understand how to use WikiFlow effectively.
 
-## What is WikiFlow?
+  // ## What is WikiFlow?
 
-WikiFlow is a modern, user-friendly wiki system built with **Next.js** and **TypeScript**. It allows you to create, edit, and organize your knowledge in a clean, accessible format.
+  // WikiFlow is a modern, user-friendly wiki system built with **Next.js** and **TypeScript**. It allows you to create, edit, and organize your knowledge in a clean, accessible format.
 
-### Key Features
+  // ### Key Features
 
-- **Markdown Support**: Write content using familiar Markdown syntax
-- **Real-time Preview**: See your changes as you type
-- **File Attachments**: Upload images and documents
-- **Responsive Design**: Works perfectly on desktop and mobile
-- **Search Functionality**: Find your content quickly
+  // - **Markdown Support**: Write content using familiar Markdown syntax
+  // - **Real-time Preview**: See your changes as you type
+  // - **File Attachments**: Upload images and documents
+  // - **Responsive Design**: Works perfectly on desktop and mobile
+  // - **Search Functionality**: Find your content quickly
 
-## Getting Started
+  // ## Getting Started
 
-### Creating Your First Article
+  // ### Creating Your First Article
 
-1. Click the **"New Article"** button
-2. Enter a descriptive title
-3. Write your content using Markdown
-4. Optionally attach files or images
-5. Click **"Save Article"** to publish
+  // 1. Click the **"New Article"** button
+  // 2. Enter a descriptive title
+  // 3. Write your content using Markdown
+  // 4. Optionally attach files or images
+  // 5. Click **"Save Article"** to publish
 
-### Markdown Basics
+  // ### Markdown Basics
 
-Here are some common Markdown elements you can use:
+  // Here are some common Markdown elements you can use:
 
-**Bold text** and *italic text*
+  // **Bold text** and *italic text*
 
-- Bullet points
-- Work great for lists
-- Easy to read
+  // - Bullet points
+  // - Work great for lists
+  // - Easy to read
 
-1. Numbered lists
-2. Are also supported
-3. Perfect for step-by-step guides
+  // 1. Numbered lists
+  // 2. Are also supported
+  // 3. Perfect for step-by-step guides
 
-> Blockquotes are perfect for highlighting important information or quotes from other sources.
+  // > Blockquotes are perfect for highlighting important information or quotes from other sources.
 
-### Code Examples
+  // ### Code Examples
 
-You can include inline \`code\` or code blocks:
+  // You can include inline \`code\` or code blocks:
 
-\`\`\`javascript
-function welcomeMessage() {
-  console.log("Welcome to WikiFlow!");
-  return "Happy writing!";
-}
-\`\`\`
+  // \`\`\`javascript
+  // function welcomeMessage() {
+  //   console.log("Welcome to WikiFlow!");
+  //   return "Happy writing!";
+  // }
+  // \`\`\`
 
-### Links and References
+  // ### Links and References
 
-You can easily create [links to other pages](https://example.com) or reference other articles in your wiki.
+  // You can easily create [links to other pages](https://example.com) or reference other articles in your wiki.
 
-## Advanced Features
+  // ## Advanced Features
 
-### Tables
+  // ### Tables
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| Markdown Editor | Rich text editing | ✅ Available |
-| File Upload | Attach documents | ✅ Available |
-| Search | Find content quickly | 🚧 Coming Soon |
+  // | Feature | Description | Status |
+  // |---------|-------------|--------|
+  // | Markdown Editor | Rich text editing | ✅ Available |
+  // | File Upload | Attach documents | ✅ Available |
+  // | Search | Find content quickly | 🚧 Coming Soon |
 
-### Images
+  // ### Images
 
-Images can be embedded directly in your articles and will be displayed beautifully within the content.
+  // Images can be embedded directly in your articles and will be displayed beautifully within the content.
 
-## Tips for Success
+  // ## Tips for Success
 
-1. **Use descriptive titles** - Make it easy to find your articles later
-2. **Organize with headers** - Break up long content into sections
-3. **Link related articles** - Create connections between your knowledge
-4. **Regular updates** - Keep your information current and relevant
+  // 1. **Use descriptive titles** - Make it easy to find your articles later
+  // 2. **Organize with headers** - Break up long content into sections
+  // 3. **Link related articles** - Create connections between your knowledge
+  // 4. **Regular updates** - Keep your information current and relevant
 
-## Need Help?
+  // ## Need Help?
 
-If you encounter any issues or have questions about using WikiFlow, don't hesitate to reach out to our support team or check the documentation.
+  // If you encounter any issues or have questions about using WikiFlow, don't hesitate to reach out to our support team or check the documentation.
 
-Happy writing! 🚀`,
-    author: "Admin User",
-    createdAt: "2024-01-15",
-    imageUrl: "/placeholder-image.svg", // Using SVG placeholder for demonstration
-  };
+  // Happy writing! 🚀`,
+  //     author: "Admin User",
+  //     createdAt: "2024-01-15",
+  //     imageUrl: "/placeholder-image.svg", // Using SVG placeholder for demonstration
+  //   };
 
-  return <WikiArticleViewer article={mockArticle} canEdit={canEdit} />;
+  return <WikiArticleViewer article={article} canEdit={isEditable} />;
 }
