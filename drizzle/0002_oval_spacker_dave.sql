@@ -1,0 +1,1 @@
+ALTER TABLE "users_sync" ADD COLUMN "token" text;

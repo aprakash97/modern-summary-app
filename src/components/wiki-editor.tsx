@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createArticle } from "@/app/actions/articles";
+import { updateArticle } from "@/app/actions/articles";
 
 interface WikiEditorProps {
   initialTitle?: string;
@@ -97,6 +97,8 @@ export default function WikiEditor({
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsSubmitting(false);
+
+    await updateArticle(articleId || "", formData)
 
     // In a real app, you would navigate after successful submission
     alert(
