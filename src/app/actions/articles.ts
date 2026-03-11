@@ -7,6 +7,7 @@ import { articles } from "@/db/schema";
 import { ensureUserExists } from "@/db/sync-user";
 import { authorizeToEditArticle } from "@/db/authz";
 import { redirect } from "next/navigation";
+import redis from "@/cache";
 
 export type CreateArticleInput = {
   title: string;
@@ -29,13 +30,20 @@ export async function createArticle(data: CreateArticleInput) {
 
   await ensureUserExists(user);
 
-  const res = await db.insert(articles).values({
-    title: data.title,
-    content: data.content,
-    authorId: user.id,
-    slug: `${Date.now()}`,
-    published: true,
-  }).returning();
+  const res = await db
+    .insert(articles)
+    .values({
+      title: data.title,
+      content: data.content,
+      authorId: user.id,
+      slug: `${Date.now()}`,
+      published: true,
+      imageUrl: data.imageUrl ?? undefined,
+    })
+    .returning();
+
+  //when user creates an article, will immediately redirected to home page where he can see article.
+  redis.del("articles:all");
 
   console.log("✨ create article called.", data, res);
   return { success: true, message: "Article created", result: res };
@@ -59,6 +67,7 @@ export async function updateArticle(id: string, data: UpdateArticleInput) {
       .set({
         title: data.title,
         content: data.content,
+        imageUrl: data.imageUrl ?? undefined,
       })
       .where(eq(articles.id, +id));
   } catch (e) {
