@@ -8,6 +8,7 @@ import { ensureUserExists } from "@/db/sync-user";
 import { authorizeToEditArticle } from "@/db/authz";
 import { redirect } from "next/navigation";
 import redis from "@/cache";
+import summarizeArticle from "../../ai/summarize";
 
 export type CreateArticleInput = {
   title: string;
@@ -30,6 +31,7 @@ export async function createArticle(data: CreateArticleInput) {
 
   await ensureUserExists(user);
 
+  const summary = await summarizeArticle(data.title || "", data.content || "");
   const res = await db
     .insert(articles)
     .values({
@@ -39,6 +41,7 @@ export async function createArticle(data: CreateArticleInput) {
       slug: `${Date.now()}`,
       published: true,
       imageUrl: data.imageUrl ?? undefined,
+      summary,
     })
     .returning();
 
@@ -60,6 +63,7 @@ export async function updateArticle(id: string, data: UpdateArticleInput) {
   }
 
   const authorId = user.id;
+  const summary = await summarizeArticle(data.title || "", data.content || "");
 
   try {
     await db
@@ -68,6 +72,7 @@ export async function updateArticle(id: string, data: UpdateArticleInput) {
         title: data.title,
         content: data.content,
         imageUrl: data.imageUrl ?? undefined,
+        summary: summary ?? undefined,
       })
       .where(eq(articles.id, +id));
   } catch (e) {

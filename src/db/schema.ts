@@ -4,7 +4,7 @@ export const usersSync = pgTable("users_sync", {
   id: text("id").primaryKey(),
   name: text("name"),
   email: text("email"),
-  token: text("token")
+  token: text("token"),
 });
 
 export const articles = pgTable("articles", {
@@ -19,6 +19,7 @@ export const articles = pgTable("articles", {
     .references(() => usersSync.id),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+  summary: text("summary"),
 });
 
 const schema = { articles, usersSync };
