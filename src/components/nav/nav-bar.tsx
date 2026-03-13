@@ -25,7 +25,7 @@ export async function NavBar() {
               {user ? (
                 <>
                   <Button asChild variant="secondary">
-                    <Link href="/wiki/edit/new">New +</Link>
+                    <Link href="/wiki/edit/new">+ New Article</Link>
                   </Button>
                   <NavigationMenuItem>
                     <UserButton />
