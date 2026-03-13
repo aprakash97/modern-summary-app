@@ -6,7 +6,7 @@ import { articles } from "@/db/schema";
 import redis from "@/cache";
 import { title } from "node:process";
 
-//API runs only in dev mood with the check, both by postman and cron
+// can only be run within vercel, hint -cron secret
 export async function GET(req: NextRequest) {
   if (
     process.env.NODE_ENV !== "development" &&
