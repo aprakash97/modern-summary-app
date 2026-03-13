@@ -44,7 +44,7 @@ export default async function sendCelebrationEmail(
 
   const emailRes = await resend.emails.send({
     from: "wikimasters <noreply@resend.dev>",
-    to: "prakashakrakr@gmail.com",
+    to: email,
     subject: `✨ your article on wikimasters got ${pageView} view`,
     html: "<h1>Congrats!</h1><p>You're an amazing author</p>",
     react: (
